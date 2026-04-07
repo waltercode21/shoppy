@@ -6,44 +6,7 @@
 'use strict';
 
 // ── PRODUCT DATA ──────────────────────────────────────
-const PRODUCTS = [
-  // FASHION
-  { id: 1,  category: 'fashion',     name: 'Classic White Tee',           price: 49.99,  rating: 4, img: 'images/pro41.jpeg' },
-  { id: 2,  category: 'fashion',     name: 'Slim Fit Jeans',              price: 99.99,  rating: 4, img: 'images/pro39.jpeg' },
-  { id: 3,  category: 'fashion',     name: 'Summer Floral Dress',         price: 29.99,  rating: 5, img: 'images/pro2.jpeg' },
-  { id: 4,  category: 'fashion',     name: 'Leather Jacket',              price: 89.99,  rating: 4, img: 'images/pro37.jpeg' },
-  { id: 5,  category: 'fashion',     name: 'Louis Vuitton Bag',             price: 49.99,  rating: 4, img: 'images/pro4.jpeg' },
-  { id: 6,  category: 'fashion',     name: 'Gucci Hand Bag',               price: 59.99,  rating: 3, img: 'images/pro5.jpeg' },
-  { id: 7,  category: 'fashion',     name: 'Nike Air Jordan 1',                price: 200.99,  rating: 4, img: 'images/pro6.jpeg'},
-  { id: 8,  category: 'fashion',     name: 'Striped Polo Shirt',          price: 24.99,  rating: 4, img: 'images/pro38.jpeg' },
-
-  // ELECTRONICS
-  { id: 9,  category: 'electronics', name: 'Wireless Headphones',         price: 129.99, rating: 5, img: 'images/pro26.jpeg' },
-  { id: 10, category: 'electronics', name: 'Bluetooth Speaker',           price: 79.99,  rating: 4, img: 'images/pro27.jpeg' },
-  { id: 11, category: 'electronics', name: 'Wireless Mouse',                 price: 199.99, rating: 5, img: 'images/pro15.jpeg' },
-  { id: 12, category: 'electronics', name: 'Laptop Stand',                price: 34.99,  rating: 4, img: 'images/pro31.jpeg' },
-  { id: 13, category: 'electronics', name: 'Mechanical Keyboard',         price: 89.99,  rating: 5, img: 'images/pro36.jpeg' },
-  { id: 14, category: 'electronics', name: 'USB-C Hub',                   price: 44.99,  rating: 4, img: 'images/pro35.jpeg' },
-  { id: 15, category: 'electronics', name: 'Webcam HD 1080p',             price: 59.99,  rating: 4, img: 'images/pro32.jpeg' },
-  { id: 16, category: 'electronics', name: 'Portable Charger',            price: 29.99,  rating: 4, img: 'images/pro13.jpeg' },
-
-  // BOOKS
-  { id: 17, category: 'books',       name: '48 Laws of Power',            price: 55.99,  rating: 5, img: 'images/pro17.jpeg' },
-  { id: 18, category: 'books',       name: 'Think and Grow Rich',         price: 65.99,   rating: 5, img: 'images/pro18.jpeg' },
-  { id: 19, category: 'books',       name: 'Good To Great',               price: 79.99,  rating: 5, img: 'images/pro30.jpeg' },
-  { id: 20, category: 'books',       name: 'The 4-Hour Workweek',         price: 99.99,  rating: 4, img: 'images/pro20.jpeg' },
-  { id: 21, category: 'books',       name: 'Rich Dad Poor Dad',           price: 49.99,  rating: 5, img: 'images/pro28.jpeg' },
-  { id: 22, category: 'books',       name: 'Emotional Intelligence Habits',     price: 70.99,  rating: 5, img: 'images/pro29.jpeg' },
-
-  // beauty
-  {id: 23, category: 'Beauty', name: 'coconut moiturising cream & oil', price: 40.99, rating: 4, img: 'images/pro45.jpeg'},
-  {id: 24, category: 'Beauty', name: 'Vaseline (cocoa glow)', price: 50.99, rating: 5, img: 'images/pro23.jpeg'},
-  {id: 25, category: 'Beauty', name: 'NIVEA Express Hydration Body Lotion', price: 39.99, rating: 4, img: 'images/pro21.jpeg'},
-  {id: 26, category: 'Beauty', name: 'Sweet Lips', price: 19.99, rating: 3, img: 'images/pro25.jpeg'},
-  {id: 26, category: 'Beauty', name: 'DOVE', price: 120.99, rating: 5, img: 'images/pro24.jpeg'},
- 
- 
-];
+let PRODUCTS = []; // Now fetched from Supabase
 
 const PROMO_CODES = { SAVE10: 0.10, SAVE20: 0.20, SHOPPY5: 0.05 };
 const DELIVERY_FEE = 5.00;
@@ -399,11 +362,29 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
   });
 });
 
+// ── FETCH PRODUCTS FROM SUPABASE ─────────────────────
+async function fetchProducts() {
+  try {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*');
+
+    if (error) throw error;
+    PRODUCTS = data;
+    
+    // Once products are loaded, initialize UI
+    initProductPage();
+    initFeatured();
+  } catch (err) {
+    console.error('Error fetching products:', err);
+    showToast('Failed to load products. Using local data...');
+  }
+}
+
 // ── INIT ──────────────────────────────────────────────
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   initNavbar();
   updateCartBadge();
-  initProductPage();
-  initFeatured();
+  await fetchProducts(); // Fetch data first
   renderCartPage();
 });
