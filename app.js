@@ -115,12 +115,125 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// ── AUTH HANDLER ──────────────────────────────────────
+// ── AUTH LOGIC ────────────────────────────────────────
+let authMode = 'login'; // 'login' or 'signup'
+
 function handleAuth(select) {
   const val = select.value;
   if (!val) return;
-  showToast(val === 'signup' ? 'Sign up coming soon!' : 'Login coming soon!');
+  
+  if (val === 'logout') {
+    handleSignOut();
+  } else {
+    openAuthModal(val);
+  }
   select.value = '';
+}
+
+function openAuthModal(mode = 'login') {
+  authMode = mode;
+  const modal = document.getElementById('authModal');
+  if (!modal) return;
+  
+  updateAuthUI();
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeAuthModal() {
+  const modal = document.getElementById('authModal');
+  if (modal) modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'signup' : 'login';
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const title = document.getElementById('authTitle');
+  const subtitle = document.getElementById('authSubtitle');
+  const submitBtn = document.getElementById('authSubmitBtn');
+  const switchText = document.getElementById('authSwitchText');
+
+  if (authMode === 'login') {
+    title.textContent = 'Log In';
+    subtitle.textContent = 'Welcome back! Please enter your details.';
+    submitBtn.textContent = 'Log In';
+    switchText.innerHTML = `Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a>`;
+  } else {
+    title.textContent = 'Sign Up';
+    subtitle.textContent = 'Join Shoppy today and start shopping!';
+    submitBtn.textContent = 'Create Account';
+    switchText.innerHTML = `Already have an account? <a href="#" onclick="toggleAuthMode()">Log In</a>`;
+  }
+}
+
+async function handleAuthSubmit(e) {
+  e.preventDefault();
+  const email = document.getElementById('authEmail').value;
+  const password = document.getElementById('authPassword').value;
+  const submitBtn = document.getElementById('authSubmitBtn');
+
+  submitBtn.disabled = true;
+  submitBtn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Processing...';
+
+  try {
+    let result;
+    if (authMode === 'login') {
+      result = await supabase.auth.signInWithPassword({ email, password });
+    } else {
+      result = await supabase.auth.signUp({ email, password });
+    }
+
+    if (result.error) throw result.error;
+
+    showToast(authMode === 'login' ? 'Logged in successfully!' : 'Account created!');
+    closeAuthModal();
+  } catch (err) {
+    console.error('Auth error:', err.message);
+    showToast(`Error: ${err.message}`);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = authMode === 'login' ? 'Log In' : 'Create Account';
+  }
+}
+
+async function handleSignOut() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    showToast(`Logout error: ${error.message}`);
+  } else {
+    showToast('Logged out successfully.');
+  }
+}
+
+// ── SESSION MANAGEMENT ────────────────────────────────
+function initAuthListener() {
+  supabase.auth.onAuthStateChange((event, session) => {
+    updateNavbarAuthUI(session?.user);
+  });
+}
+
+function updateNavbarAuthUI(user) {
+  const selects = document.querySelectorAll('.auth-select');
+  selects.forEach(select => {
+    if (user) {
+      // User is logged in
+      select.innerHTML = `
+        <option value="">${user.email}</option>
+        <option value="logout">Log Out</option>
+      `;
+    } else {
+      // User is logged out
+      select.innerHTML = `
+        <option value="">Account</option>
+        <option value="signup">Sign Up</option>
+        <option value="login">Log In</option>
+      `;
+    }
+  });
 }
 
 // ── TOAST ─────────────────────────────────────────────
@@ -384,6 +497,7 @@ async function fetchProducts() {
 // ── INIT ──────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
   initNavbar();
+  initAuthListener(); // Start listening for auth changes
   updateCartBadge();
   await fetchProducts(); // Fetch data first
   renderCartPage();

@@ -95,6 +95,34 @@
     </aside>
   </div>
 
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="authModal">
+    <div class="auth-modal">
+      <button class="modal-close" onclick="closeAuthModal()"><i class="ri-close-line"></i></button>
+      <div class="auth-header">
+        <i class="ri-shopping-bag-3-line auth-logo-icon"></i>
+        <h2 id="authTitle">Log In</h2>
+        <p id="authSubtitle">Welcome back! Please enter your details.</p>
+      </div>
+      <form class="auth-form" onsubmit="handleAuthSubmit(event)">
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="authEmail" placeholder="name@example.com" required />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary auth-submit-btn" id="authSubmitBtn">
+          Continue
+        </button>
+      </form>
+      <div class="auth-footer">
+        <p id="authSwitchText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+      </div>
+    </div>
+  </div>
+
   <div class="toast" id="toast"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="supabase.js"></script>
