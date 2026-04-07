@@ -109,8 +109,12 @@
             </div>
         </div>
         <div class="input-group">
-          <label>Image URL</label>
-          <input type="url" id="pImg" placeholder="https://example.com/image.jpg" required />
+          <label>Image URL (Optional if uploading)</label>
+          <input type="url" id="pImg" placeholder="https://example.com/image.jpg" />
+        </div>
+        <div class="input-group">
+            <label>Upload Image (New File)</label>
+            <input type="file" id="pImgFile" accept="image/*" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); border-radius: 8px; padding: 0.5rem;" />
         </div>
         <div class="input-group">
             <label>Rating (1-5)</label>

@@ -424,19 +424,31 @@ function closeProductModal() {
 async function handleProductSubmit(e) {
   e.preventDefault();
   const id = document.getElementById('editProductId').value;
-  const productData = {
-    name: document.getElementById('pName').value,
-    price: parseFloat(document.getElementById('pPrice').value),
-    category: document.getElementById('pCategory').value,
-    img: document.getElementById('pImg').value,
-    rating: parseInt(document.getElementById('pRating').value)
-  };
+  const fileInput = document.getElementById('pImgFile');
+  let imageUrl = document.getElementById('pImg').value;
 
   const btn = document.getElementById('productSubmitBtn');
   btn.disabled = true;
-  btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Saving...';
+  btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Processing...';
 
   try {
+    // 1. Handle File Upload if present
+    if (fileInput.files.length > 0) {
+      imageUrl = await uploadProductImage(fileInput.files[0]);
+    }
+
+    if (!imageUrl) {
+        throw new Error('Please provide an image URL or upload a file.');
+    }
+
+    const productData = {
+      name: document.getElementById('pName').value,
+      price: parseFloat(document.getElementById('pPrice').value),
+      category: document.getElementById('pCategory').value,
+      img: imageUrl,
+      rating: parseInt(document.getElementById('pRating').value)
+    };
+
     let error;
     if (id) {
        const res = await supabase.from('products').update(productData).eq('id', id);
@@ -450,15 +462,35 @@ async function handleProductSubmit(e) {
 
     showToast(id ? 'Product updated!' : 'Product added!');
     closeProductModal();
-    await fetchProducts(); // Efficiently refresh global PRODUCTS and UI
+    await fetchProducts(); 
     renderAdminTable();
     updateAdminStats();
   } catch (err) {
+    console.error('Save error:', err);
     showToast(`Error: ${err.message}`);
   } finally {
     btn.disabled = false;
     btn.textContent = 'Save Product';
   }
+}
+
+async function uploadProductImage(file) {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+    const filePath = `uploads/${fileName}`;
+
+    const { data, error } = await supabase.storage
+      .from('product-images')
+      .upload(filePath, file);
+
+    if (error) throw error;
+
+    // Get Public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('product-images')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
 }
 
 async function handleDeleteProduct(id) {
