@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Orders - Shoppy</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
+<body>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="logo">
+      <a href="index.html" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="ri-shopping-bag-3-line logo-icon"></i>
+        <span>shoppy</span>
+      </a>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-links" id="navLinks">
+      <div class="nav-item">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="product.html">Products</a></li>
+      </div>
+      <div class="nav-actions">
+        <a href="cart.html" class="nav-cart-link" aria-label="Cart">
+          <i class="ri-shopping-cart-line"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <select class="auth-select" onchange="handleAuth(this)">
+          <!-- Dynamic -->
+        </select>
+      </div>
+    </ul>
+  </nav>
+
+  <main class="orders-container">
+    <header class="orders-header">
+      <h1>My Orders</h1>
+      <p>View and track your past Shoppy purchases.</p>
+    </header>
+
+    <div id="ordersList">
+        <!-- Dynamic: Orders will be rendered here -->
+        <div class="empty-orders">
+            <i class="ri-loader-4-line ri-spin"></i>
+            <p>Loading your orders...</p>
+        </div>
+    </div>
+  </main>
+
+  <!-- AUTH MODAL -->
+  <div class="modal-overlay" id="authModal">
+    <div class="auth-modal">
+      <button class="modal-close" onclick="closeAuthModal()"><i class="ri-close-line"></i></button>
+      <div class="auth-header">
+        <i class="ri-shopping-bag-3-line auth-logo-icon"></i>
+        <h2 id="authTitle">Log In</h2>
+        <p id="authSubtitle">Welcome back! Please enter your details.</p>
+      </div>
+      <form class="auth-form" onsubmit="handleAuthSubmit(event)">
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="authEmail" placeholder="name@example.com" required />
+        </div>
+        <div class="input-group">
+          <label>Password</label>
+          <input type="password" id="authPassword" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn btn-primary auth-submit-btn" id="authSubmitBtn">
+          Continue
+        </button>
+      </form>
+      <div class="auth-footer">
+        <p id="authSwitchText">Don't have an account? <a href="#" onclick="toggleAuthMode()">Sign Up</a></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+  <script>
+    // Specific initialization for orders page
+    document.addEventListener('DOMContentLoaded', () => {
+        renderOrdersPage();
+    });
+  </script>
+</body>
+</html>

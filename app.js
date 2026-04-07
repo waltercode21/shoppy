@@ -124,6 +124,8 @@ function handleAuth(select) {
   
   if (val === 'logout') {
     handleSignOut();
+  } else if (val === 'orders') {
+    window.location.href = 'orders.html';
   } else {
     openAuthModal(val);
   }
@@ -223,6 +225,7 @@ function updateNavbarAuthUI(user) {
       // User is logged in
       select.innerHTML = `
         <option value="">${user.email}</option>
+        <option value="orders">My Orders</option>
         <option value="logout">Log Out</option>
       `;
     } else {
@@ -234,6 +237,92 @@ function updateNavbarAuthUI(user) {
       `;
     }
   });
+}
+
+// ── ORDERS PAGE LOGIC ─────────────────────────────────
+async function renderOrdersPage() {
+  const listContainer = document.getElementById('ordersList');
+  if (!listContainer) return;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    listContainer.innerHTML = `
+      <div class="empty-orders">
+        <i class="ri-user-forbid-line"></i>
+        <p>Please log in to view your order history.</p>
+        <button class="btn btn-primary" onclick="openAuthModal('login')">Log In Now</button>
+      </div>
+    `;
+    return;
+  }
+
+  try {
+    // Fetch orders and items using a join or two queries
+    // We'll fetch orders first, then items for each
+    const { data: orders, error: ordersError } = await supabase
+      .from('orders')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (ordersError) throw ordersError;
+
+    if (!orders || orders.length === 0) {
+      listContainer.innerHTML = `
+        <div class="empty-orders">
+          <i class="ri-inbox-line"></i>
+          <p>You haven't placed any orders yet.</p>
+          <a href="product.html" class="btn btn-primary">Start Shopping</a>
+        </div>
+      `;
+      return;
+    }
+
+    // Fetch all items for these orders
+    const orderIds = orders.map(o => o.id);
+    const { data: items, error: itemsError } = await supabase
+      .from('order_items')
+      .select('*')
+      .in('order_id', orderIds);
+
+    if (itemsError) throw itemsError;
+
+    listContainer.innerHTML = orders.map(order => {
+      const orderItems = items.filter(i => i.order_id === order.id);
+      const date = new Date(order.created_at).toLocaleDateString('en-GB', {
+        day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+      });
+
+      return `
+        <div class="order-card">
+          <div class="order-id-row">
+            <div>
+              <span class="order-id">ORD-${order.id.slice(0, 8).toUpperCase()}</span>
+              <span class="order-date">${date}</span>
+            </div>
+            <span class="order-status status-${order.status}">${order.status}</span>
+          </div>
+          <div class="order-items-list">
+            ${orderItems.map(item => `
+              <div class="item-row">
+                <div class="item-info">
+                  ${item.product_name} <span class="item-qty">x${item.quantity}</span>
+                </div>
+                <span class="item-price">₵${item.price_at_purchase.toFixed(2)}</span>
+              </div>
+            `).join('')}
+          </div>
+          <div class="order-total-row">
+            <span class="total-label">Order Total</span>
+            <span class="total-value">₵${order.total_price.toFixed(2)}</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+
+  } catch (err) {
+    console.error('Error loading orders:', err);
+    listContainer.innerHTML = `<p style="text-align:center; color:red;">Failed to load orders: ${err.message}</p>`;
+  }
 }
 
 // ── TOAST ─────────────────────────────────────────────
