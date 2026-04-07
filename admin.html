@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Shoppy</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
+<body>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="logo">
+      <a href="index.html" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="ri-shopping-bag-3-line logo-icon"></i>
+        <span>shoppy</span>
+      </a>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-links" id="navLinks">
+      <div class="nav-item">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="product.html">Products</a></li>
+      </div>
+      <div class="nav-actions">
+        <select class="auth-select" onchange="handleAuth(this)">
+          <!-- Dynamic -->
+        </select>
+      </div>
+    </ul>
+  </nav>
+
+  <main class="admin-container">
+    <header class="admin-header">
+      <div>
+        <h1>Store Admin</h1>
+        <p>Manage your inventory and track performance.</p>
+      </div>
+      <button class="btn btn-primary" onclick="openProductModal()">
+        <i class="ri-add-line"></i> Add New Product
+      </button>
+    </header>
+
+    <div class="admin-stats">
+        <div class="stat-card">
+            <div class="stat-icon"><i class="ri-shopping-cart-2-line"></i></div>
+            <div class="stat-info">
+                <h3 id="statTotalProducts">0</h3>
+                <p>Products</p>
+            </div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="ri-wallet-3-line"></i></div>
+            <div class="stat-info">
+                <h3 id="statTotalOrders">0</h3>
+                <p>Orders</p>
+            </div>
+        </div>
+    </div>
+
+    <section class="admin-table-wrapper">
+        <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Rating</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="adminProductTable">
+                <!-- Dynamic -->
+            </tbody>
+        </table>
+    </section>
+  </main>
+
+  <!-- ADD/EDIT PRODUCT MODAL -->
+  <div class="modal-overlay" id="productModal">
+    <div class="auth-modal">
+      <button class="modal-close" onclick="closeProductModal()"><i class="ri-close-line"></i></button>
+      <div class="auth-header">
+        <h2 id="modalProductTitle">Add Product</h2>
+      </div>
+      <form class="auth-form" onsubmit="handleProductSubmit(event)">
+        <input type="hidden" id="editProductId" />
+        <div class="input-group">
+          <label>Product Name</label>
+          <input type="text" id="pName" placeholder="E.g. Wireless Headphones" required />
+        </div>
+        <div class="admin-form-grid">
+            <div class="input-group">
+                <label>Price (₵)</label>
+                <input type="number" step="0.01" id="pPrice" placeholder="0.00" required />
+            </div>
+            <div class="input-group">
+                <label>Category</label>
+                <select id="pCategory" style="background: rgba(255,255,255,0.05); color: white; border: 1px solid var(--border); border-radius: 8px; padding: 0.9rem;">
+                    <option value="fashion">Fashion</option>
+                    <option value="electronics">Electronics</option>
+                    <option value="books">Books</option>
+                    <option value="Beauty">Beauty</option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group">
+          <label>Image URL</label>
+          <input type="url" id="pImg" placeholder="https://example.com/image.jpg" required />
+        </div>
+        <div class="input-group">
+            <label>Rating (1-5)</label>
+            <input type="number" min="1" max="5" id="pRating" value="5" required />
+          </div>
+        <button type="submit" class="btn btn-primary auth-submit-btn" id="productSubmitBtn">
+          Save Product
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        initAdminDashboard();
+    });
+  </script>
+</body>
+</html>

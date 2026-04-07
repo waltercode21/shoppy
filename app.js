@@ -126,6 +126,8 @@ function handleAuth(select) {
     handleSignOut();
   } else if (val === 'orders') {
     window.location.href = 'orders.html';
+  } else if (val === 'admin') {
+    window.location.href = 'admin.html';
   } else {
     openAuthModal(val);
   }
@@ -225,6 +227,7 @@ function updateNavbarAuthUI(user) {
       // User is logged in
       select.innerHTML = `
         <option value="">${user.email}</option>
+        ${user.email === 'officialwalter188@gmail.com' ? '<option value="admin">Admin Dashboard</option>' : ''}
         <option value="orders">My Orders</option>
         <option value="logout">Log Out</option>
       `;
@@ -322,6 +325,155 @@ async function renderOrdersPage() {
   } catch (err) {
     console.error('Error loading orders:', err);
     listContainer.innerHTML = `<p style="text-align:center; color:red;">Failed to load orders: ${err.message}</p>`;
+  }
+}
+
+// ── ADMIN DASHBOARD LOGIC ─────────────────────────────
+async function initAdminDashboard() {
+  const table = document.getElementById('adminProductTable');
+  if (!table) return;
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user || user.email !== 'officialwalter188@gmail.com') {
+    alert('Unauthorized. Redirecting...');
+    window.location.href = 'index.html';
+    return;
+  }
+
+  renderAdminTable();
+  updateAdminStats();
+}
+
+async function updateAdminStats() {
+    const { count: pCount } = await supabase.from('products').select('*', { count: 'exact', head: true });
+    const { count: oCount } = await supabase.from('orders').select('*', { count: 'exact', head: true });
+    
+    if (document.getElementById('statTotalProducts')) document.getElementById('statTotalProducts').textContent = pCount || 0;
+    if (document.getElementById('statTotalOrders')) document.getElementById('statTotalOrders').textContent = oCount || 0;
+}
+
+async function renderAdminTable() {
+  const tableBody = document.getElementById('adminProductTable');
+  if (!tableBody) return;
+
+  try {
+    const { data: products, error } = await supabase
+      .from('products')
+      .select('*')
+      .order('id', { ascending: false });
+
+    if (error) throw error;
+
+    tableBody.innerHTML = products.map(p => `
+      <tr>
+        <td>
+          <div class="admin-product-cell">
+            <img src="${p.img}" alt="${p.name}" onerror="this.src='https://via.placeholder.com/50'"/>
+            <div>
+              <strong>${p.name}</strong>
+              <div style="font-size: 0.75rem; color: #888;">ID: ${p.id}</div>
+            </div>
+          </div>
+        </td>
+        <td><span class="category">${p.category}</span></td>
+        <td>₵${p.price.toFixed(2)}</td>
+        <td>${p.rating} ⭐</td>
+        <td>
+          <div class="admin-actions">
+            <button class="action-btn btn-edit-item" onclick="openProductModal(${p.id})" title="Edit"><i class="ri-edit-line"></i></button>
+            <button class="action-btn btn-delete-item" onclick="handleDeleteProduct(${p.id})" title="Delete"><i class="ri-delete-bin-line"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  } catch (err) {
+    console.error('Admin Table Error:', err.message);
+  }
+}
+
+function openProductModal(productId = null) {
+  const modal = document.getElementById('productModal');
+  const title = document.getElementById('modalProductTitle');
+  const form = modal.querySelector('form');
+  
+  form.reset();
+  document.getElementById('editProductId').value = '';
+
+  if (productId) {
+    title.textContent = 'Edit Product';
+    const p = PRODUCTS.find(prod => prod.id === productId);
+    if (p) {
+      document.getElementById('editProductId').value = p.id;
+      document.getElementById('pName').value = p.name;
+      document.getElementById('pPrice').value = p.price;
+      document.getElementById('pCategory').value = p.category;
+      document.getElementById('pImg').value = p.img;
+      document.getElementById('pRating').value = p.rating;
+    }
+  } else {
+    title.textContent = 'Add New Product';
+  }
+
+  modal.classList.add('active');
+}
+
+function closeProductModal() {
+  document.getElementById('productModal').classList.remove('active');
+}
+
+async function handleProductSubmit(e) {
+  e.preventDefault();
+  const id = document.getElementById('editProductId').value;
+  const productData = {
+    name: document.getElementById('pName').value,
+    price: parseFloat(document.getElementById('pPrice').value),
+    category: document.getElementById('pCategory').value,
+    img: document.getElementById('pImg').value,
+    rating: parseInt(document.getElementById('pRating').value)
+  };
+
+  const btn = document.getElementById('productSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Saving...';
+
+  try {
+    let error;
+    if (id) {
+       const res = await supabase.from('products').update(productData).eq('id', id);
+       error = res.error;
+    } else {
+       const res = await supabase.from('products').insert([productData]);
+       error = res.error;
+    }
+
+    if (error) throw error;
+
+    showToast(id ? 'Product updated!' : 'Product added!');
+    closeProductModal();
+    await fetchProducts(); // Efficiently refresh global PRODUCTS and UI
+    renderAdminTable();
+    updateAdminStats();
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Product';
+  }
+}
+
+async function handleDeleteProduct(id) {
+  if (!confirm('Are you sure you want to delete this product?')) return;
+
+  try {
+    const { error } = await supabase.from('products').delete().eq('id', id);
+    if (error) throw error;
+
+    showToast('Product deleted.');
+    await fetchProducts();
+    renderAdminTable();
+    updateAdminStats();
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
   }
 }
 

@@ -1131,3 +1131,133 @@ footer { margin-top: 4rem; }
   .hero-btns { flex-direction: column; align-items: center; }
   .hero-btns .btn { width: 100%; max-width: 280px; justify-content: center; }
 }
+
+/* 
+   ADMIN DASHBOARD
+    */
+.admin-container {
+  max-width: 1200px;
+  margin: 6rem auto 4rem;
+  padding: 0 1.5rem;
+}
+
+.admin-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 3rem;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 3rem;
+}
+
+.stat-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  background: rgba(255, 69, 0, 0.1);
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  font-size: 1.5rem;
+}
+
+.stat-info h3 { font-size: 1.5rem; font-weight: 800; }
+.stat-info p { color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; }
+
+.admin-table-wrapper {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.admin-table th {
+  background: rgba(255,255,255,0.05);
+  padding: 1.2rem;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.admin-table td {
+  padding: 1rem 1.2rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.admin-table tr:last-child td { border-bottom: none; }
+
+.admin-product-cell {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.admin-product-cell img {
+  width: 45px;
+  height: 45px;
+  object-fit: cover;
+  border-radius: 6px;
+  background: #333;
+}
+
+.admin-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  color: white;
+}
+
+.btn-edit-item { background: #3498db; }
+.btn-delete-item { background: #e74c3c; }
+.action-btn:hover { opacity: 0.8; }
+
+.admin-modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+}
+
+.admin-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
