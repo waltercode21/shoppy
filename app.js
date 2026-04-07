@@ -342,6 +342,32 @@ async function initAdminDashboard() {
 
   renderAdminTable();
   updateAdminStats();
+  initRealtimeOrders(); // Activate live alerts
+}
+
+function initRealtimeOrders() {
+  supabase
+    .channel('admin-orders')
+    .on('postgres_changes', { 
+      event: 'INSERT', 
+      schema: 'public', 
+      table: 'orders' 
+    }, payload => {
+      handleNewOrderAlert(payload.new);
+    })
+    .subscribe();
+}
+
+function handleNewOrderAlert(order) {
+  // 1. Play Notification Sound
+  const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+  audio.play().catch(e => console.log('Audio play blocked/failed:', e));
+  
+  // 2. Visual Toast
+  showToast(`💰 NEW ORDER! ₵${order.total_price.toFixed(2)} just received!`);
+  
+  // 3. Live UI Refresh
+  updateAdminStats();
 }
 
 async function updateAdminStats() {
