@@ -126,6 +126,8 @@ function handleAuth(select) {
     handleSignOut();
   } else if (val === 'orders') {
     window.location.href = 'orders.html';
+  } else if (val === 'profile') {
+    window.location.href = 'profile.html';
   } else if (val === 'admin') {
     window.location.href = 'admin.html';
   } else {
@@ -228,6 +230,7 @@ function updateNavbarAuthUI(user) {
       select.innerHTML = `
         <option value="">${user.email}</option>
         ${user.email === 'officialwalter188@gmail.com' ? '<option value="admin">Admin Dashboard</option>' : ''}
+        <option value="profile">My Profile</option>
         <option value="orders">My Orders</option>
         <option value="logout">Log Out</option>
       `;
@@ -643,6 +646,108 @@ async function handleDeleteProduct(id) {
     updateAdminStats();
   } catch (err) {
     showToast(`Error: ${err.message}`);
+  }
+}
+
+// ── USER PROFILE LOGIC ────────────────────────────────
+async function initUserProfile() {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    window.location.href = 'index.html';
+    return;
+  }
+
+  document.getElementById('userEmailDisplay').textContent = user.email;
+  const joinDate = new Date(user.created_at).toLocaleDateString('en-GB', { 
+    day: 'numeric', month: 'long', year: 'numeric' 
+  });
+  document.getElementById('userJoinDate').textContent = `Member since ${joinDate}`;
+
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    if (error) throw error;
+
+    if (profile) {
+      document.getElementById('fullName').value = profile.full_name || '';
+      document.getElementById('phoneNumber').value = profile.phone_number || '';
+      document.getElementById('shippingAddress').value = profile.shipping_address || '';
+      if (profile.avatar_url) {
+        document.getElementById('userAvatar').src = profile.avatar_url;
+      }
+    }
+  } catch (err) {
+    console.error('Profile Error:', err.message);
+  }
+}
+
+async function handleProfileUpdate(e) {
+  e.preventDefault();
+  const btn = document.getElementById('profileSubmitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> Saving...';
+
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const updates = {
+    id: user.id,
+    full_name: document.getElementById('fullName').value,
+    phone_number: document.getElementById('phoneNumber').value,
+    shipping_address: document.getElementById('shippingAddress').value,
+    updated_at: new Date()
+  };
+
+  try {
+    const { error } = await supabase.from('profiles').upsert(updates);
+    if (error) throw error;
+    showToast('Profile updated successfully!');
+  } catch (err) {
+    showToast(`Error: ${err.message}`);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Save Profile';
+  }
+}
+
+async function handleAvatarUpload(input) {
+  if (!input.files || input.files.length === 0) return;
+  const file = input.files[0];
+  const { data: { user } } = await supabase.auth.getUser();
+
+  const fileExt = file.name.split('.').pop();
+  const filePath = `${user.id}/${Math.random()}.${fileExt}`;
+
+  showToast('Uploading avatar...');
+
+  try {
+    // 1. Upload to storage
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) throw uploadError;
+
+    // 2. Get Public URL
+    const { data: { publicUrl } } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    // 3. Update profiles table
+    const { error: updateError } = await supabase
+      .from('profiles')
+      .update({ avatar_url: publicUrl })
+      .eq('id', user.id);
+
+    if (updateError) throw updateError;
+
+    document.getElementById('userAvatar').src = publicUrl;
+    showToast('Avatar updated!');
+  } catch (err) {
+    showToast(`Upload Error: ${err.message}`);
   }
 }
 

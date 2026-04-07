@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Profile - Shoppy</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
+<body>
+
+  <nav class="navbar scrolled" id="navbar">
+    <div class="logo">
+      <a href="index.html" style="color: inherit; text-decoration: none; display: flex; align-items: center; gap: 0.5rem;">
+        <i class="ri-shopping-bag-3-line logo-icon"></i>
+        <span>shoppy</span>
+      </a>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-links" id="navLinks">
+      <div class="nav-item">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="product.html">Products</a></li>
+      </div>
+      <div class="nav-actions">
+        <select class="auth-select" onchange="handleAuth(this)">
+          <!-- Dynamic -->
+        </select>
+      </div>
+    </ul>
+  </nav>
+
+  <main class="profile-container">
+    <div class="profile-wrapper">
+        <div class="profile-header">
+            <div class="profile-avatar-container" onclick="document.getElementById('avatarInput').click()">
+                <img id="userAvatar" src="https://via.placeholder.com/150" alt="Avatar" />
+                <div class="avatar-overlay"><i class="ri-camera-line"></i></div>
+                <input type="file" id="avatarInput" accept="image/*" style="display: none;" onchange="handleAvatarUpload(this)" />
+            </div>
+            <h2 id="userEmailDisplay">Loading...</h2>
+            <p id="userJoinDate">Member since...</p>
+        </div>
+
+        <form class="profile-form" onsubmit="handleProfileUpdate(event)">
+            <div class="input-group">
+                <label>Full Name</label>
+                <input type="text" id="fullName" placeholder="Your full name" />
+            </div>
+            <div class="input-group">
+                <label>Phone Number</label>
+                <input type="tel" id="phoneNumber" placeholder="+233..." />
+            </div>
+            <div class="input-group">
+                <label>Shipping Address</label>
+                <textarea id="shippingAddress" rows="3" placeholder="Street, City, Region"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary profile-submit-btn" id="profileSubmitBtn">
+                Save Profile
+            </button>
+        </form>
+    </div>
+  </main>
+
+  <div class="toast" id="toast"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        initUserProfile();
+    });
+  </script>
+</body>
+</html>
