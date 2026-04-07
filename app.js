@@ -342,6 +342,7 @@ async function initAdminDashboard() {
 
   renderAdminTable();
   updateAdminStats();
+  initAdminCharts(); // Initial load of charts
   initRealtimeOrders(); // Activate live alerts
 }
 
@@ -368,6 +369,116 @@ function handleNewOrderAlert(order) {
   
   // 3. Live UI Refresh
   updateAdminStats();
+  initAdminCharts(); // Live update charts
+}
+
+// ── ANALYTICS LOGIC ───────────────────────────────────
+let revenueChart, categoryChart;
+
+async function initAdminCharts() {
+  if (!document.getElementById('revenueChart')) return;
+
+  const { data: orders, error: ordersError } = await supabase
+    .from('orders')
+    .select('total_price, created_at')
+    .order('created_at', { ascending: true });
+
+  const { data: items, error: itemsError } = await supabase
+    .from('order_items')
+    .select('product_name, price_at_purchase, quantity');
+
+  if (ordersError || itemsError) return;
+
+  renderRevenueChart(orders);
+  renderCategoryChart(items);
+  updateRevenueToday(orders);
+}
+
+function updateRevenueToday(orders) {
+    const today = new Date().toLocaleDateString();
+    const todaySales = orders
+        .filter(o => new Date(o.created_at).toLocaleDateString() === today)
+        .reduce((sum, o) => sum + Number(o.total_price), 0);
+    
+    const el = document.getElementById('statTotalRevenue');
+    if (el) el.textContent = `₵${todaySales.toFixed(2)}`;
+}
+
+function renderRevenueChart(orders) {
+  const ctx = document.getElementById('revenueChart')?.getContext('2d');
+  if (!ctx) return;
+
+  const labels = [];
+  const data = [];
+  for (let i = 6; i >= 0; i--) {
+    const d = new Date();
+    d.setDate(d.getDate() - i);
+    const dateStr = d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
+    labels.push(dateStr);
+    
+    const dayTotal = orders
+      .filter(o => new Date(o.created_at).toLocaleDateString() === d.toLocaleDateString())
+      .reduce((sum, o) => sum + Number(o.total_price), 0);
+    data.push(dayTotal);
+  }
+
+  if (revenueChart) revenueChart.destroy();
+  revenueChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Revenue (₵)',
+        data,
+        borderColor: '#ff4500',
+        backgroundColor: 'rgba(255, 69, 0, 0.1)',
+        fill: true,
+        tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' } },
+        x: { grid: { display: false }, ticks: { color: '#888' } }
+      }
+    }
+  });
+}
+
+function renderCategoryChart(items) {
+  const ctx = document.getElementById('categoryChart')?.getContext('2d');
+  if (!ctx) return;
+
+  const itemMap = {};
+  items.forEach(i => {
+    itemMap[i.product_name] = (itemMap[i.product_name] || 0) + (i.price_at_purchase * i.quantity);
+  });
+
+  const labels = Object.keys(itemMap).slice(0, 5);
+  const data = labels.map(l => itemMap[l]);
+
+  if (categoryChart) categoryChart.destroy();
+  categoryChart = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        backgroundColor: ['#ff4500', '#3498db', '#9b59b6', '#2ecc71', '#f1c40f'],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: 'bottom', labels: { color: '#888', font: { size: 10 } } }
+      }
+    }
+  });
 }
 
 async function updateAdminStats() {

@@ -6,6 +6,7 @@
   <title>Admin Dashboard - Shoppy</title>
   <link rel="stylesheet" href="styles.css">
   <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
@@ -59,8 +60,26 @@
                 <h3 id="statTotalOrders">0</h3>
                 <p>Orders</p>
             </div>
+        <div class="stat-card">
+            <div class="stat-icon"><i class="ri-money-dollar-circle-line"></i></div>
+            <div class="stat-info">
+                <h3 id="statTotalRevenue">₵0</h3>
+                <p>Today's Sales</p>
+            </div>
         </div>
     </div>
+
+    <!-- ANALYTICS SECTION -->
+    <section class="admin-charts-section">
+        <div class="chart-container">
+            <h3>Revenue (Last 7 Days)</h3>
+            <canvas id="revenueChart"></canvas>
+        </div>
+        <div class="chart-container">
+            <h3>Top Categories</h3>
+            <canvas id="categoryChart"></canvas>
+        </div>
+    </section>
 
     <section class="admin-table-wrapper">
         <table class="admin-table">
