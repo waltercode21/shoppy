@@ -794,18 +794,26 @@ function initProductPage() {
   const booksGrid       = document.getElementById('books-grid');
   const BeautyGrid       = document.getElementById('Beauty-grid');
 
-
   if (!fashionGrid) return;
 
-  const fashion     = PRODUCTS.filter(p => p.category === 'fashion');
-  const electronics = PRODUCTS.filter(p => p.category === 'electronics');
-  const books       = PRODUCTS.filter(p => p.category === 'books');
-  const Beauty      = PRODUCTS.filter(p => p.category === 'Beauty');
+  // Use a fragment or batch updates for performance
+  const grids = {
+    fashion: fashionGrid,
+    electronics: electronicsGrid,
+    books: booksGrid,
+    Beauty: BeautyGrid
+  };
 
-  fashionGrid.innerHTML     = fashion.map(productCard).join('');
-  electronicsGrid.innerHTML = electronics.map(productCard).join('');
-  booksGrid.innerHTML       = books.map(productCard).join('');
-  BeautyGrid.innerHTML      = Beauty.map(productCard).join('');
+  // Clear grids first
+  Object.values(grids).forEach(g => g.innerHTML = '');
+
+  // Distribute products in one pass
+  PRODUCTS.forEach(p => {
+    const grid = grids[p.category];
+    if (grid) {
+      grid.innerHTML += productCard(p);
+    }
+  });
 }
 
 // ── SEARCH / FILTER / SORT ────────────────────────────
@@ -1041,7 +1049,10 @@ document.querySelectorAll('a[href^="#"]').forEach(a => {
 });
 
 // ── FETCH PRODUCTS FROM SUPABASE ─────────────────────
+let isFetching = false;
 async function fetchProducts() {
+  if (isFetching) return;
+  isFetching = true;
   try {
     const { data, error } = await supabase
       .from('products')
@@ -1050,12 +1061,16 @@ async function fetchProducts() {
     if (error) throw error;
     PRODUCTS = data;
     
-    // Once products are loaded, initialize UI
-    initProductPage();
-    initFeatured();
+    // Once products are loaded, initialize UI efficiently
+    requestAnimationFrame(() => {
+      initProductPage();
+      initFeatured();
+    });
   } catch (err) {
     console.error('Error fetching products:', err);
-    showToast('Failed to load products. Using local data...');
+    showToast('Failed to load products.');
+  } finally {
+    isFetching = false;
   }
 }
 
