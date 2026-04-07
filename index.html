@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shoppy - Your One-Stop Shop</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
+<body>
+
+  <header id="home">
+    <nav class="navbar" id="navbar">
+      <div class="logo">
+        <i class="ri-shopping-bag-3-line logo-icon"></i>
+        <span>shoppy</span>
+      </div>
+
+      <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+
+      <ul class="nav-links" id="navLinks">
+        <div class="nav-item">
+          <li><a href="#home" onclick="closeMenu()">Home</a></li>
+          <li><a href="#about" onclick="closeMenu()">About</a></li>
+          <li><a href="#services" onclick="closeMenu()">Services</a></li>
+          <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+        </div>
+        <div class="nav-actions">
+          <a href="cart.html" class="nav-cart-link" aria-label="Cart">
+            <i class="ri-shopping-cart-line"></i>
+            <span class="cart-badge" id="cartBadge">0</span>
+          </a>
+          <select class="auth-select" onchange="handleAuth(this)">
+            <option value="">Account</option>
+            <option value="signup">Sign Up</option>
+            <option value="login">Log In</option>
+          </select>
+        </div>
+      </ul>
+    </nav>
+
+    <section class="main">
+      <div class="hero-content">
+        <p class="hero-sub">✦ New arrivals every week</p>
+        <h1 class="heading1">Welcome to Shoppy</h1>
+        <h2 class="heading2">Your One-Stop Shop for All Your Needs</h2>
+        <div class="hero-btns">
+          <a href="product.html" class="btn btn-primary">Shop Now</a>
+          <a href="#about" class="btn btn-outline">Learn More</a>
+        </div>
+        <div class="hero-stats">
+          <div class="stat"><strong>10K+</strong><span>Products</span></div>
+          <div class="stat"><strong>50K+</strong><span>Customers</span></div>
+          <div class="stat"><strong>4.9★</strong><span>Rating</span></div>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <!-- SERVICES -->
+  <section class="sec services" id="services">
+    <h1 class="heading1">Our Services</h1>
+    <p class="section-sub">Everything you need for a seamless shopping experience</p>
+    <div class="services-container">
+      <div class="box">
+        <i class="ri-truck-line"></i>
+        <h2>Fast Delivery</h2>
+        <p>Get your products delivered to your doorstep within 24–48 hours.</p>
+      </div>
+      <div class="box">
+        <i class="ri-shield-check-line"></i>
+        <h2>Secure Payment</h2>
+        <p>Shop with confidence — your payment info is fully encrypted.</p>
+      </div>
+      <div class="box">
+        <i class="ri-customer-service-2-line"></i>
+        <h2>24/7 Support</h2>
+        <p>Our team is available around the clock to assist you anytime.</p>
+      </div>
+      <div class="box">
+        <i class="ri-refresh-line"></i>
+        <h2>Easy Returns</h2>
+        <p>Not satisfied? Return any item within 30 days, no questions asked.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED -->
+  <section class="sec featured-section" id="featured">
+    <h1 class="heading1">Featured Products</h1>
+    <p class="section-sub">Hand-picked top sellers just for you</p>
+    <div class="product-container" id="featuredGrid"></div>
+    <div style="text-align:center; margin-top:2.5rem;">
+      <a href="product.html" class="btn btn-primary">View All Products</a>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="sec about" id="about">
+    <div class="about-grid">
+      <div class="about-text">
+        <h1 class="heading1" style="text-align:left;">About Us</h1>
+        <p>At Shoppy, we are passionate about providing the best shopping experience. We offer a wide range of products, from electronics to fashion, all at competitive prices.</p>
+        <p style="margin-top:1rem;">Our mission is to make online shopping easy, convenient, and enjoyable for everyone.</p>
+        <a href="product.html" class="btn btn-primary" style="margin-top:1.5rem;display:inline-block;">Start Shopping</a>
+      </div>
+      <div class="about-features">
+        <div class="feature-item"><i class="ri-checkbox-circle-line"></i> Wide product range</div>
+        <div class="feature-item"><i class="ri-checkbox-circle-line"></i> Competitive prices</div>
+        <div class="feature-item"><i class="ri-checkbox-circle-line"></i> Trusted by 50,000+ customers</div>
+        <div class="feature-item"><i class="ri-checkbox-circle-line"></i> Secure & fast checkout</div>
+        <div class="feature-item"><i class="ri-checkbox-circle-line"></i> Easy 30-day returns</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="sec contact" id="contact">
+    <h1 class="heading1">Contact Us</h1>
+    <p class="section-sub">We'd love to hear from you</p>
+    <div class="contact-grid">
+      <div class="contact-info">
+        <div class="contact-item"><i class="ri-mail-line"></i><span>support@shoppy.com</span></div>
+        <div class="contact-item"><i class="ri-phone-line"></i><span>+233 591896729</span></div>
+        <div class="contact-item"><i class="ri-map-pin-line"></i><span>HFRC+M4R Poly Rd, Ho</span></div>
+        <div class="contact-item"><i class="ri-time-line"></i><span>Mon–sun, 9am–6pm EST</span></div>
+      </div>
+      <form class="contact-form" onsubmit="handleContactForm(event)">
+        <input type="text" placeholder="Your Name" required />
+        <input type="email" placeholder="Your Email" required />
+        <textarea placeholder="Your Message" rows="4" required></textarea>
+        <button type="submit" class="btn btn-primary">Send Message</button>
+        <p class="form-success" id="formSuccess">✓ Message sent! We'll be in touch shortly.</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer_col">
+        <div class="footer_logo">
+          <i class="ri-shopping-bag-3-line" style="font-size:2rem;color:orangered;"></i>
+          <span>shoppy</span>
+        </div>
+        <div class="footer_text">
+          <p>Passionate about providing the best shopping experience — wide range, competitive prices.</p>
+        </div>
+        <ul class="footer_socials">
+          <li><a href="#" aria-label="Facebook"><i class="ri-facebook-line"></i></a></li>
+          <li><a href="#" aria-label="Twitter"><i class="ri-twitter-line"></i></a></li>
+          <li><a href="#" aria-label="Instagram"><i class="ri-instagram-line"></i></a></li>
+          <li><a href="#" aria-label="YouTube"><i class="ri-youtube-line"></i></a></li>
+        </ul>
+      </div>
+      <div class="footer_col">
+        <h2>Shop</h2>
+        <ul class="footer_links">
+          <li><a href="product.html">Fashion</a></li>
+          <li><a href="product.html">Electronics</a></li>
+          <li><a href="product.html">Books</a></li>
+           <li><a href="product.html">Beauty</a></li>
+          <li><a href="product.html">New Arrivals</a></li>
+        </ul>
+      </div>
+      <div class="footer_col">
+        <h2>Support</h2>
+        <ul class="footer_links">
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Contact Us</a></li>
+          <li><a href="#">Shipping &amp; Returns</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer_col">
+        <h2>Company</h2>
+        <ul class="footer_links">
+          <li><a href="#">Our Story</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Terms of Service</a></li>
+          <li><a href="#">Return Policy</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Shoppy. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

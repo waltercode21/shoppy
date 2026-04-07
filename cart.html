@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shoppy - Cart</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
+<body>
+
+  <nav class="navbar" id="navbar">
+    <div class="logo">
+      <i class="ri-shopping-bag-3-line logo-icon"></i>
+      <span>shoppy</span>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-links" id="navLinks">
+      <div class="nav-item">
+        <li><a href="index.html" onclick="closeMenu()">Home</a></li>
+        <li><a href="index.html#about" onclick="closeMenu()">About</a></li>
+        <li><a href="index.html#services" onclick="closeMenu()">Services</a></li>
+        <li><a href="index.html#contact" onclick="closeMenu()">Contact</a></li>
+      </div>
+      <div class="nav-actions">
+        <a href="cart.html" class="nav-cart-link" aria-label="Cart">
+          <i class="ri-shopping-cart-line"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <select class="auth-select" onchange="handleAuth(this)">
+          <option value="">Account</option>
+          <option value="signup">Sign Up</option>
+          <option value="login">Log In</option>
+        </select>
+      </div>
+    </ul>
+  </nav>
+
+  <div class="page-hero">
+    <h1>Your Cart</h1>
+    <p>Review your items before checkout</p>
+  </div>
+
+  <div class="cart-wrapper">
+    <!-- LEFT: CART ITEMS -->
+    <div class="cart-left">
+      <div class="cart-header-row">
+        <span class="col-product">Product</span>
+        <span class="col-price">Price</span>
+        <span class="col-qty">Quantity</span>
+        <span class="col-total">Total</span>
+        <span class="col-remove"></span>
+      </div>
+
+      <div id="cartItemsContainer"></div>
+
+      <div class="empty-cart" id="emptyCart" style="display:none;">
+        <i class="ri-shopping-cart-line"></i>
+        <h3>Your cart is empty</h3>
+        <p>Looks like you haven't added anything yet.</p>
+        <a href="product.html" class="btn btn-primary">Continue Shopping</a>
+      </div>
+
+      <div class="cart-actions" id="cartActions">
+        <a href="product.html" class="btn btn-outline">← Continue Shopping</a>
+        <button class="btn btn-danger" onclick="clearCart()">Clear Cart</button>
+      </div>
+    </div>
+
+    <!-- RIGHT: ORDER SUMMARY -->
+    <aside class="cart-summary" id="cartSummary">
+      <h3>Order Summary</h3>
+      <div class="summary-row"><span>Subtotal</span><span id="summarySubtotal">$0.00</span></div>
+      <div class="summary-row"><span>Delivery</span><span id="summaryDelivery">$5.00</span></div>
+      <div class="promo-row">
+        <input type="text" id="promoInput" placeholder="Promo code" class="promo-input"/>
+        <button class="btn btn-outline promo-apply" onclick="applyPromo()">Apply</button>
+      </div>
+      <p class="promo-msg" id="promoMsg"></p>
+      <div class="summary-row discount-row" id="discountRow" style="display:none;">
+        <span>Discount</span><span id="summaryDiscount" style="color:#4caf50;">-$0.00</span>
+      </div>
+      <div class="summary-divider"></div>
+      <div class="summary-row summary-total">
+        <span>Total</span><span id="summaryTotal">$0.00</span>
+      </div>
+      <button class="btn btn-primary checkout-btn" onclick="handleCheckout()">
+        <i class="ri-lock-line"></i> Proceed to Checkout
+      </button>
+      <p class="secure-note"><i class="ri-shield-check-line"></i> Secure checkout · Free returns · SSL encrypted</p>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>

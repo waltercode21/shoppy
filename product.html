@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shoppy - Products</title>
+  <link rel="stylesheet" href="styles.css">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.9.0/fonts/remixicon.css" rel="stylesheet"/>
+</head>
+<body>
+
+  <nav class="navbar" id="navbar">
+    <div class="logo">
+      <i class="ri-shopping-bag-3-line logo-icon"></i>
+      <span>shoppy</span>
+    </div>
+
+    <button class="hamburger" id="hamburger" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-links" id="navLinks">
+      <div class="nav-item">
+        <li><a href="index.html" onclick="closeMenu()">Home</a></li>
+        <li><a href="index.html#about" onclick="closeMenu()">About</a></li>
+        <li><a href="index.html#services" onclick="closeMenu()">Services</a></li>
+        <li><a href="index.html#contact" onclick="closeMenu()">Contact</a></li>
+      </div>
+      <div class="nav-actions">
+        <a href="cart.html" class="nav-cart-link" aria-label="Cart">
+          <i class="ri-shopping-cart-line"></i>
+          <span class="cart-badge" id="cartBadge">0</span>
+        </a>
+        <select class="auth-select" onchange="handleAuth(this)">
+          <option value="">Account</option>
+          <option value="signup">Sign Up</option>
+          <option value="login">Log In</option>
+        </select>
+      </div>
+    </ul>
+  </nav>
+
+  <!-- PAGE HEADER -->
+  <div class="page-hero">
+    <h1>Our Products</h1>
+    <p>Discover our curated collection of fashion, electronics, books & More</p>
+  </div>
+
+  <!-- FILTER BAR -->
+  <div class="filter-bar">
+    <div class="filter-group">
+      <input type="text" class="search-input" id="searchInput" placeholder="&#xEE11;  Search products..." oninput="filterProducts()"/>
+    </div>
+    <div class="filter-group">
+      <select class="filter-select" id="categoryFilter" onchange="filterProducts()">
+        <option value="all">All Categories</option>
+        <option value="fashion">Fashion</option>
+        <option value="electronics">Electronics</option>
+        <option value="books">Books</option>
+         <option value="Beauty">Beauty</option>
+      </select>
+      <select class="filter-select" id="sortFilter" onchange="filterProducts()">
+        <option value="default">Sort by</option>
+        <option value="price-low">Price: Low → High</option>
+        <option value="price-high">Price: High → Low</option>
+        <option value="name">Name A–Z</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- PRODUCTS -->
+  <div class="products-page">
+    <section class="products" id="fashion-section">
+      <div class="heading"><h2>Fashion</h2></div>
+      <div class="product-container" id="fashion-grid"></div>
+    </section>
+
+    <section class="products" id="electronics-section">
+      <div class="heading"><h2>Electronics</h2></div>
+      <div class="product-container" id="electronics-grid"></div>
+    </section>
+
+    <section class="products" id="books-section">
+      <div class="heading"><h2>Self Improvement Books</h2></div>
+      <div class="product-container" id="books-grid"></div>
+    </section>
+  
+
+   <section class="products" id="Beauty-section">
+      <div class="heading"><h2>Beauty</h2></div>
+      <div class="product-container" id="Beauty-grid"></div>
+    </section>
+  </div>
+
+
+  <!-- No results message -->
+  <p class="no-results" id="noResults">No products match your search.</p>
+
+  <!-- FOOTER -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer_col">
+        <div class="footer_logo">
+          <i class="ri-shopping-bag-3-line" style="font-size:2rem;color:orangered;"></i>
+          <span>shoppy</span>
+        </div>
+        <div class="footer_text">
+          <p>Passionate about providing the best shopping experience.</p>
+        </div>
+        <ul class="footer_socials">
+          <li><a href="#"><i class="ri-facebook-line"></i></a></li>
+          <li><a href="#"><i class="ri-twitter-line"></i></a></li>
+          <li><a href="#"><i class="ri-instagram-line"></i></a></li>
+        </ul>
+      </div>
+      <div class="footer_col">
+        <h2>Shop</h2>
+        <ul class="footer_links">
+          <li><a href="#">Fashion</a></li>
+          <li><a href="#">Electronics</a></li>
+          <li><a href="#">Books</a></li>
+          <li><a href="#">Beauty</a></li>
+        </ul>
+      </div>
+      <div class="footer_col">
+        <h2>Support</h2>
+        <ul class="footer_links">
+          <li><a href="#">Help Center</a></li>
+          <li><a href="#">Returns</a></li>
+          <li><a href="#">Privacy Policy</a></li>
+        </ul>
+      </div>
+      <div class="footer_col">
+        <h2>Company</h2>
+        <ul class="footer_links">
+          <li><a href="#">Our Story</a></li>
+          <li><a href="#">Careers</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© 2025 Shoppy. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="app.js"></script>
+</body>
+</html>
