@@ -442,14 +442,64 @@ function applyPromo() {
   }
 }
 
-function handleCheckout() {
+async function handleCheckout() {
   const cart = getCart();
   if (cart.length === 0) {
     showToast('Your cart is empty!');
     return;
   }
-  showToast('Redirecting to secure checkout…');
-  // In a real app: window.location.href = '/checkout';
+
+  // 1. Check if logged in
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
+    showToast('Please log in to complete your checkout.');
+    openAuthModal('login');
+    return;
+  }
+
+  showToast('Processing your order...');
+
+  try {
+    const subtotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
+    const delivery = subtotal > 0 && subtotal < FREE_DELIVERY_THRESHOLD ? DELIVERY_FEE : 0;
+    const discount = Math.round(subtotal * promoDiscount * 100) / 100;
+    const total = Math.max(0, subtotal + delivery - discount);
+
+    // 2. Create Order
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .insert({
+        user_id: user.id,
+        total_price: total,
+        status: 'pending'
+      })
+      .select()
+      .single();
+
+    if (orderError) throw orderError;
+
+    // 3. Create Order Items
+    const itemsToInsert = cart.map(item => ({
+      order_id: order.id,
+      product_name: item.name,
+      quantity: item.qty,
+      price_at_purchase: item.price
+    }));
+
+    const { error: itemsError } = await supabase
+      .from('order_items')
+      .insert(itemsToInsert);
+
+    if (itemsError) throw itemsError;
+
+    // 4. Success!
+    saveCart([]); // Clear cart
+    renderCartPage();
+    showToast('Order placed successfully! Thank you for shopping.');
+  } catch (err) {
+    console.error('Checkout error:', err.message);
+    showToast(`Checkout failed: ${err.message}`);
+  }
 }
 
 // ── CONTACT FORM ──────────────────────────────────────
